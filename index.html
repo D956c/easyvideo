@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>视频播放</title>
+  <script src="./easyplayers/EasyPlayer-pro.js"></script>
+  <style>
+   
+
+    .player_item {
+      position: relative;
+      padding-bottom: 56%;
+      background-color: black;
+      width: 100%;
+    }
+
+    .player_box {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
+    }
+
+    .box {
+    padding-top: 10px;
+    margin: auto;
+    max-width: 800px;
+  }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+  <div class="player_item">
+    <div class="player_box" id="player_box"></div>
+  </div>
+  </div>
+
+
+  <script>
+    window.onload = function () {
+      const streamUrl =
+        "https://jingheyw.com:1443/rtp/33040000001320000121_33040000001320000101.live.flv?originTypeStr=rtp_push";
+
+      const config = {
+        stretch: true,
+        hasAudio: true
+      };
+
+      const container = document.getElementById('player_box');
+      const player = new EasyPlayerPro(container, config);
+
+      player.play(streamUrl).catch(err => {
+        console.error(err);
+      });
+    };
+  </script>
+
+</body>
+</html>
