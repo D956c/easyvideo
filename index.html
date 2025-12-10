@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>视频播放</title>
+  <title>演示</title>
   <script src="./easyplayer/EasyPlayer-pro.js"></script>
 </head>
 <style>
@@ -23,6 +23,7 @@
     right: 0;
     left: 0;
   }
+
   .inputs {
     -webkit-appearance: none;
     background-color: #fff;
@@ -44,6 +45,7 @@
     margin-bottom: 16px;
     margin-top: 16px;
   }
+
   .btn-item {
     cursor: pointer;
     display: inline-block;
@@ -52,11 +54,7 @@
     border-radius: 4px;
     border: 1px #ccc solid;
   }
-  .df {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-  }
+
   .box {
     padding-top: 10px;
     margin: auto;
@@ -66,25 +64,25 @@
 
 <body>
   <div class="box">
-    <br>
-    <h2>EasyPlayerPro案例演示</h2>
-    <br>
     <div class="player_item">
       <div class="player_box" id="player_box"></div>
     </div>
     <div>
-      <input id="hasAudio" type="checkbox" /><span >音频</span>
+      <input id="hasAudio" type="checkbox" /><span>音频</span>
     </div>
-    <input class="inputs" type="text" id="input" value="https://jingheyw.com:1443/rtp/33040000001320000121_33040000001320000101.live.flv?originTypeStr=rtp_push">
+
+    <input class="inputs" type="text" id="input"
+      value="https://jingheyw.com:1443/rtp/33040000001320000121_33040000001320000101.live.flv?originTypeStr=rtp_push">
+
     <div>
-      <div class="btn-item" id="onPlayer" >播放</div>
-      <div class="btn-item" id="onReplay" >重播</div>
+      <div class="btn-item" id="onPlayer">播放</div>
+      <div class="btn-item" id="onReplay">重播</div>
       <div class="btn-item" id="onMute">静音</div>
-      <div class="btn-item" id="onStop" >注销</div>
+      <div class="btn-item" id="onStop">注销</div>
     </div>
   </div>
+
   <script>
-    // 微信 WebView 中不能使用 new URL()，只能手动解析
     function getQueryParam(key) {
       const query = window.location.search.substring(1);
       const params = query.split("&");
@@ -96,87 +94,75 @@
       }
       return "";
     }
-  
-    const autoloadUrl = getQueryParam("url"); // 微信小程序传进来的流地址
-  
+
+    const autoloadUrl = getQueryParam("url");
+
     window.onload = function () {
-      var playerInfo = null
-      var config = {
+      let playerInfo = null;
+      const config = {
         stretch: true,
-        hasAudio: true,
-      }
-  
-      // 自动填充 URL
-      var input = document.getElementById('input');
-      if (autoloadUrl) {
-        input.value = autoloadUrl;  
-      }
-  
-      playCreate()
-  
-      var audio = document.getElementById('hasAudio');
-      var player = document.getElementById('onPlayer');
-      var replay = document.getElementById('onReplay');
-      var mute = document.getElementById('onMute');
-      var stop = document.getElementById('onStop');
-  
-      if (config.hasAudio) audio.checked = true
-      audio.onclick = () => {
-        config.hasAudio = audio.checked
-      }
-  
-      player.onclick = () => {
-        onPlayer()
-      }
-      replay.onclick = () => {
-        onReplay()
-      }
-      mute.onclick = () => {
-        onMute()
-      }
-      stop.onclick = () => {
-        onStop()
-      }
-  
-      function playCreate() {
-        var container = document.getElementById('player_box');
+        hasAudio: true
+      };
+
+      const input = document.getElementById("input");
+      if (autoloadUrl) input.value = autoloadUrl;
+
+      createPlayer();
+
+      const audio = document.getElementById("hasAudio");
+      const player = document.getElementById("onPlayer");
+      const replay = document.getElementById("onReplay");
+      const mute = document.getElementById("onMute");
+      const stop = document.getElementById("onStop");
+
+      audio.checked = true;
+      audio.onclick = () => config.hasAudio = audio.checked;
+
+      player.onclick = onPlayer;
+      replay.onclick = onReplay;
+      mute.onclick = onMute;
+      stop.onclick = onStop;
+
+      function createPlayer() {
+        const container = document.getElementById("player_box");
         playerInfo = new EasyPlayerPro(container, config);
       }
-  
+
       function onPlayer() {
-        playerInfo && playerInfo.play(input.value).catch((e) => {
-          console.error(e);
-        });
+        if (!playerInfo) return;
+        playerInfo.play(input.value).catch(err => console.error(err));
       }
-  
-      function onMute() {
-        if (!playerInfo) return
-        playerInfo.setMute(true)
-      }
-  
+
       function onReplay() {
-        onDestroy().then(() => {
-          playCreate();
+        destroyPlayer().then(() => {
+          createPlayer();
           onPlayer();
         });
       }
-  
-      function onDestroy() {
-        return new Promise((resolve) => {
+
+      function onMute() {
+        if (playerInfo) playerInfo.setMute(true);
+      }
+
+      function destroyPlayer() {
+        return new Promise(resolve => {
           if (playerInfo) {
             playerInfo.destroy();
             playerInfo = null;
           }
-          setTimeout(() => resolve(), 100);
+          setTimeout(resolve, 100);
         });
       }
-  
+
       function onStop() {
-        onDestroy().then(() => {
-          playCreate();
-        });
+        destroyPlayer().then(() => createPlayer());
       }
-    }
+
+      // 自动播放
+      setTimeout(() => {
+        onPlayer();
+      }, 300);
+    };
   </script>
 
 </body>
